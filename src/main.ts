@@ -1,36 +1,46 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { APP_PORT, USER_SERVICE_HOST, USER_SERVICE_PORT } from './config';
+import {
+  APP_HOST,
+  APP_PORT,
+  ROLE_SERVICE_PORT,
+  USER_SERVICE_PORT,
+} from './config';
 import { INestApplication } from '@nestjs/common';
 import { Transport } from '@nestjs/microservices';
-import { NextFunction } from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NextFunction } from 'express';
+import * as fs from 'fs';
 
-type MicroService = {
-  host: string;
-  port: number;
-};
+const microServicePorts = [USER_SERVICE_PORT, ROLE_SERVICE_PORT];
 
-const microservices: MicroService[] = [
-  {
-    host: USER_SERVICE_HOST,
-    port: USER_SERVICE_PORT as unknown as number,
-  },
-];
-
-const connectMicroservices = async (app: INestApplication) => {
-  microservices.forEach((element) => {
+const startAllMicroServices = async (app: INestApplication) => {
+  microServicePorts.forEach((element) => {
     app.connectMicroservice({
       transport: Transport.TCP,
       options: {
         retryAttempts: 5,
         retryDelay: 3000,
-        host: element.host,
-        port: element.port,
+        host: APP_HOST,
+        port: element,
       },
     });
   });
   await app.startAllMicroservices();
+};
+
+const enableCors = (app: INestApplication) => {
+  app.enableCors();
+};
+
+const setupSwagger = (app: INestApplication) => {
+  const options = new DocumentBuilder()
+    .setTitle('User Service')
+    .setDescription('Manages users, roles')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, options);
+  SwaggerModule.setup('doc', app, document);
 };
 
 const setupGlobalDelay = (app: INestApplication) => {
@@ -44,33 +54,24 @@ const setupGlobalDelay = (app: INestApplication) => {
     _res: Response,
     next: NextFunction,
   ) => {
-    await delay(1500);
+    await delay(1000);
     return next();
   };
   app.use(delayMiddleware);
 };
 
-const setupCors = (app: INestApplication) => {
-  app.enableCors();
-};
-
-const setupSwagger = (app: INestApplication) => {
-  const config = new DocumentBuilder()
-    .setTitle('User Service')
-    .setDescription('User Service Api Description')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-};
-
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await connectMicroservices(app);
-  setupGlobalDelay(app);
-  setupCors(app);
+  const httpsOptions = {
+    key: fs.readFileSync('./.cert/key.pem'),
+    cert: fs.readFileSync('./.cert/cert.pem'),
+  };
+  const app = await NestFactory.create(AppModule, {
+    httpsOptions: httpsOptions,
+  });
+  await startAllMicroServices(app);
+  enableCors(app);
   setupSwagger(app);
+  setupGlobalDelay(app);
   await app.listen(APP_PORT);
 }
 bootstrap();

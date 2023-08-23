@@ -3,42 +3,133 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  Inject,
+  Res,
+  HttpStatus,
+  Put,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { USER_SERVICE } from 'src/config';
+import { ClientProxy } from '@nestjs/microservices';
+import {
+  createResponse,
+  provideServiceClient,
+  respondWith,
+} from '@pilot/common/dist/response';
+import { Response } from 'express';
 
 @ApiTags('users')
 @Controller('user')
 export class UserRestController {
-  constructor(private readonly userService: UserService) {}
+  constructor(@Inject(USER_SERVICE) private readonly client: ClientProxy) {}
 
   @Post()
-  create(@Body() createRoleDto: CreateUserDto) {
-    return this.userService.create(createRoleDto);
+  async create(
+    @Body() createUserDto: CreateUserDto,
+    @Res() response: Response,
+  ) {
+    try {
+      const responseWrapper = await provideServiceClient({
+        client: this.client,
+        event: 'createUser',
+        payload: createUserDto,
+      });
+      respondWith(response, responseWrapper);
+    } catch (error) {
+      respondWith(
+        response,
+        createResponse({
+          statusCode: HttpStatus.SERVICE_UNAVAILABLE,
+          error: error,
+        }),
+      );
+    }
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  async findAll(@Res() response: Response) {
+    try {
+      const responseWrapper = await provideServiceClient({
+        client: this.client,
+        event: 'findAllUser',
+        payload: undefined,
+      });
+      respondWith(response, responseWrapper);
+    } catch (error) {
+      respondWith(
+        response,
+        createResponse({
+          statusCode: HttpStatus.SERVICE_UNAVAILABLE,
+          error: error,
+        }),
+      );
+    }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  async findOne(@Param('id') id: string, @Res() response: Response) {
+    try {
+      const responseWrapper = await provideServiceClient({
+        client: this.client,
+        event: 'findOneUser',
+        payload: id,
+      });
+      respondWith(response, responseWrapper);
+    } catch (error) {
+      respondWith(
+        response,
+        createResponse({
+          statusCode: HttpStatus.SERVICE_UNAVAILABLE,
+          error: error,
+        }),
+      );
+    }
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRoleDto: UpdateUserDto) {
-    return this.userService.update(+id, updateRoleDto);
+  @Put(':id')
+  async update(
+    @Body() updateUserDto: UpdateUserDto,
+    @Res() response: Response,
+  ) {
+    try {
+      const responseWrapper = await provideServiceClient({
+        client: this.client,
+        event: 'updateUser',
+        payload: updateUserDto,
+      });
+      respondWith(response, responseWrapper);
+    } catch (error) {
+      respondWith(
+        response,
+        createResponse({
+          statusCode: HttpStatus.SERVICE_UNAVAILABLE,
+          error: error,
+        }),
+      );
+    }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  async remove(@Param('id') id: string, @Res() response: Response) {
+    try {
+      const responseWrapper = await provideServiceClient({
+        client: this.client,
+        event: 'removeUser',
+        payload: id,
+      });
+      respondWith(response, responseWrapper);
+    } catch (error) {
+      respondWith(
+        response,
+        createResponse({
+          statusCode: HttpStatus.SERVICE_UNAVAILABLE,
+          error: error,
+        }),
+      );
+    }
   }
 }

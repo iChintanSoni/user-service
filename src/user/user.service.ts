@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { RegisterUser } from './dto/register-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import { randomUUID } from 'crypto';
+import { RegisterUser } from './dto/register-user.dto';
 import { UserAlreadyExists } from './user.service.error';
 
 @Injectable()
@@ -15,30 +16,45 @@ export class UserService {
   ) {}
 
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    const user = new User();
+    user.instituteBranchId = createUserDto.instituteBranchId;
+    user.firstName = createUserDto.firstName;
+    user.lastName = createUserDto.lastName;
+    user.email = createUserDto.email;
+    user.roleId = randomUUID();
+    return this.userRepository.save(createUserDto);
   }
 
   findAll() {
-    return `This action returns all user`;
+    return this.userRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  findOne(id: string): Promise<User | null> {
+    return this.userRepository.findOneBy({ id: id });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(updateUserDto: UpdateUserDto) {
+    const user: User = await this.findOne(updateUserDto.id);
+    user.firstName = updateUserDto.firstName;
+    user.lastName = updateUserDto.lastName;
+    user.email = updateUserDto.email;
+    user.instituteBranchId = updateUserDto.instituteBranchId;
+    user.firstName = updateUserDto.firstName;
+    return this.userRepository.save(user);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    const user = await this.findOne(id);
+    if (user) {
+      return this.userRepository.remove(user);
+    }
   }
 
-  async register(registerUser: RegisterUser) {
+  async register(registerUser: RegisterUser): Promise<User> {
     let user = await this.userRepository.findOne({
       where: {
         email: registerUser.email,
-        instituteId: registerUser.instituteId,
+        instituteBranchId: registerUser.branchId,
       },
     });
     if (user) {
@@ -47,20 +63,18 @@ export class UserService {
       );
     }
     user = new User();
-    user.instituteId = registerUser.instituteId;
+    user.instituteBranchId = registerUser.branchId;
     user.firstName = registerUser.firstName;
     user.lastName = registerUser.lastName;
     user.email = registerUser.email;
     user.userName = registerUser.email.split('@')[0];
-    user.userName = `${registerUser.email.split('@')[0]}@123`;
-    return this.userRepository.create(user);
+    user.password = `${registerUser.email.split('@')[0]}@123`;
+    return this.userRepository.save(user);
   }
 
-  addDummyUsers(instituteId: string) {}
+  // private addDummyStudents() {
+  //   fetch('https://randomuser.me/api/?results=5000');
+  // }
 
-  private addDummyStudents() {
-    fetch('https://randomuser.me/api/?results=5000');
-  }
-
-  private addDummyTeachers() {}
+  // private addDummyTeachers() {}
 }
