@@ -17,8 +17,8 @@ import { USER_SERVICE } from 'src/config';
 import { ClientProxy } from '@nestjs/microservices';
 import {
   createResponse,
-  provideServiceClient,
   respondWith,
+  sendToClient,
 } from '@pilot/common/dist/response';
 import { Response } from 'express';
 
@@ -33,7 +33,7 @@ export class UserRestController {
     @Res() response: Response,
   ) {
     try {
-      const responseWrapper = await provideServiceClient({
+      const responseWrapper = await sendToClient({
         client: this.client,
         event: 'createUser',
         payload: createUserDto,
@@ -53,10 +53,10 @@ export class UserRestController {
   @Get()
   async findAll(@Res() response: Response) {
     try {
-      const responseWrapper = await provideServiceClient({
+      const responseWrapper = await sendToClient({
         client: this.client,
         event: 'findAllUser',
-        payload: undefined,
+        payload: null,
       });
       respondWith(response, responseWrapper);
     } catch (error) {
@@ -73,7 +73,7 @@ export class UserRestController {
   @Get(':id')
   async findOne(@Param('id') id: string, @Res() response: Response) {
     try {
-      const responseWrapper = await provideServiceClient({
+      const responseWrapper = await sendToClient({
         client: this.client,
         event: 'findOneUser',
         payload: id,
@@ -96,7 +96,7 @@ export class UserRestController {
     @Res() response: Response,
   ) {
     try {
-      const responseWrapper = await provideServiceClient({
+      const responseWrapper = await sendToClient({
         client: this.client,
         event: 'updateUser',
         payload: updateUserDto,
@@ -116,7 +116,7 @@ export class UserRestController {
   @Delete(':id')
   async remove(@Param('id') id: string, @Res() response: Response) {
     try {
-      const responseWrapper = await provideServiceClient({
+      const responseWrapper = await sendToClient({
         client: this.client,
         event: 'removeUser',
         payload: id,

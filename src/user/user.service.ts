@@ -63,6 +63,7 @@ export class UserService {
       );
     }
     user = new User();
+    user.roleId = 'other';
     user.instituteBranchId = registerUser.branchId;
     user.firstName = registerUser.firstName;
     user.lastName = registerUser.lastName;

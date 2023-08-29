@@ -5,6 +5,7 @@ import { User } from './entities/user.entity';
 import { UserRestController } from './user.controller.rest';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { APP_HOST, USER_SERVICE, USER_SERVICE_PORT } from 'src/config';
+import { UserMicroController } from './user.controller.micro';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { APP_HOST, USER_SERVICE, USER_SERVICE_PORT } from 'src/config';
       },
     ]),
   ],
-  controllers: [UserRestController, UserRestController],
+  controllers: [UserRestController, UserMicroController],
   providers: [UserService],
 })
 export class UserModule {}

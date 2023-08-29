@@ -1,5 +1,5 @@
 import { Controller, HttpStatus } from '@nestjs/common';
-import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { createResponse } from '@pilot/common/dist/response';
@@ -91,23 +91,13 @@ export class UserMicroController {
     }
   }
 
-  @EventPattern('registerUser')
+  @MessagePattern('registerUser')
   async registerUser(@Payload() registerUser: RegisterUser) {
     try {
-      const registerUserResponse = await this.create({
-        instituteBranchId: registerUser.branchId,
-        firstName: registerUser.firstName,
-        lastName: registerUser.lastName,
-        email: registerUser.email,
-      });
-
-      if (registerUserResponse.error) {
-        throw registerUserResponse.error;
-      }
-
+      const user = await this.userService.register(registerUser);
       return createResponse({
         statusCode: HttpStatus.OK,
-        data: registerUserResponse,
+        data: user,
       });
     } catch (error) {
       return createResponse({
@@ -116,9 +106,4 @@ export class UserMicroController {
       });
     }
   }
-
-  // @EventPattern('addDummyStudents')
-  // addDummyStudents(branchId: string) {
-  //   return this.userService.addDummyUsers(branchId);
-  // }
 }
