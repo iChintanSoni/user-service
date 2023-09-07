@@ -1,4 +1,6 @@
 # compiled output
+.cert
+/ext-pckg
 /dist
 /node_modules
 

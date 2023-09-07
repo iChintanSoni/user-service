@@ -11,6 +11,7 @@ import { Transport } from '@nestjs/microservices';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NextFunction } from 'express';
 import * as fs from 'fs';
+import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface';
 
 const microServicePorts = [USER_SERVICE_PORT, ROLE_SERVICE_PORT];
 
@@ -60,13 +61,16 @@ const setupGlobalDelay = (app: INestApplication) => {
   app.use(delayMiddleware);
 };
 
-async function bootstrap() {
-  const httpsOptions = {
+const provideHttpsOptions = (): HttpsOptions => {
+  return {
     key: fs.readFileSync('./.cert/key.pem'),
     cert: fs.readFileSync('./.cert/cert.pem'),
   };
+};
+
+async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    httpsOptions: httpsOptions,
+    httpsOptions: provideHttpsOptions(),
   });
   await startAllMicroServices(app);
   enableCors(app);

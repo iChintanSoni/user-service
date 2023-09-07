@@ -5,11 +5,11 @@ FROM node:20-slim
 WORKDIR /usr/src/app
 
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
-COPY package*.json ./
+# COPY package*.json ./
 
 # Copies .cert to the Docker environment
-COPY ./.cert/cert.pem ./
-COPY ./.cert/key.pem ./
+# COPY ./.cert/cert.pem ./
+# COPY ./.cert/key.pem ./
 
 # Bundle app source
 COPY . .

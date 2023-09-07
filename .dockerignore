@@ -1,0 +1,8 @@
+node_modules
+.dockerignore
+.eslintrc.js
+.gitignore
+.nvmrc
+.prettierrc
+Dockerfile
+*.md
