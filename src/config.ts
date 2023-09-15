@@ -1,4 +1,4 @@
-export const APP_HOST = process.env.APP_HOST || 'user-service';
+export const APP_HOST = process.env.APP_HOST || 'localhost';
 export const APP_PORT = process.env.APP_PORT || 3100;
 
 export const USER_SERVICE = 'UserService';

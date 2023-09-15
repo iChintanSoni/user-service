@@ -3,7 +3,7 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { createResponse } from '@pilot/common/dist/response';
-import { User } from './entities/user.entity';
+import { UserEntity } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RegisterUser } from './dto/register-user.dto';
 
@@ -15,7 +15,7 @@ export class UserMicroController {
   async create(@Payload() createUserDto: CreateUserDto) {
     try {
       const user = await this.userService.create(createUserDto);
-      return createResponse<User>({
+      return createResponse<UserEntity>({
         statusCode: HttpStatus.OK,
         data: user,
       });
@@ -28,14 +28,15 @@ export class UserMicroController {
   }
 
   @MessagePattern('findAllUser')
-  async findAll() {
+  async findAll(@Payload() nothing: undefined) {
     try {
       const users = await this.userService.findAll();
-      return createResponse<User[]>({
+      return createResponse<UserEntity[]>({
         statusCode: HttpStatus.OK,
         data: users,
       });
     } catch (error) {
+      console.error(error);
       return createResponse<void>({
         statusCode: HttpStatus.BAD_REQUEST,
         error: error,
@@ -46,8 +47,8 @@ export class UserMicroController {
   @MessagePattern('findOneUser')
   async findOne(@Payload() id: string) {
     try {
-      const user: User = await this.userService.findOne(id);
-      return createResponse<User>({
+      const user: UserEntity = await this.userService.findOne(id);
+      return createResponse<UserEntity>({
         statusCode: HttpStatus.OK,
         data: user,
       });
@@ -62,8 +63,8 @@ export class UserMicroController {
   @MessagePattern('updateUser')
   async update(@Payload() updateUserDto: UpdateUserDto) {
     try {
-      const user: User = await this.userService.update(updateUserDto);
-      return createResponse<User>({
+      const user: UserEntity = await this.userService.update(updateUserDto);
+      return createResponse<UserEntity>({
         statusCode: HttpStatus.OK,
         data: user,
       });
@@ -79,7 +80,7 @@ export class UserMicroController {
   async remove(@Payload() id: string) {
     try {
       const user = await this.userService.remove(id);
-      return createResponse<User>({
+      return createResponse<UserEntity>({
         statusCode: HttpStatus.OK,
         data: user,
       });

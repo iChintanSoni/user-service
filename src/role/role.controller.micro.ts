@@ -3,7 +3,7 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { createResponse } from '@pilot/common/dist/response';
-import { Role } from './entities/role.entity';
+import { RoleEntity } from './entities/role.entity';
 import { UpdateRoleDto } from './dto/update-role.dto';
 
 @Controller()
@@ -14,7 +14,7 @@ export class RoleMicroController {
   async create(@Payload() createRoleDto: CreateRoleDto) {
     try {
       const role = await this.roleService.create(createRoleDto);
-      return createResponse<Role>({
+      return createResponse<RoleEntity>({
         statusCode: HttpStatus.OK,
         data: role,
       });
@@ -30,7 +30,7 @@ export class RoleMicroController {
   async findAll() {
     try {
       const roles = await this.roleService.findAll();
-      return createResponse<Role[]>({
+      return createResponse<RoleEntity[]>({
         statusCode: HttpStatus.OK,
         data: roles,
       });
@@ -45,8 +45,8 @@ export class RoleMicroController {
   @MessagePattern('findOneRole')
   async findOne(@Payload() id: string) {
     try {
-      const role: Role = await this.roleService.findOne(id);
-      return createResponse<Role>({
+      const role: RoleEntity = await this.roleService.findOne(id);
+      return createResponse<RoleEntity>({
         statusCode: HttpStatus.OK,
         data: role,
       });
@@ -61,8 +61,8 @@ export class RoleMicroController {
   @MessagePattern('updateRole')
   async update(@Payload() updateRoleDto: UpdateRoleDto) {
     try {
-      const role: Role = await this.roleService.update(updateRoleDto);
-      return createResponse<Role>({
+      const role: RoleEntity = await this.roleService.update(updateRoleDto);
+      return createResponse<RoleEntity>({
         statusCode: HttpStatus.OK,
         data: role,
       });
@@ -78,7 +78,7 @@ export class RoleMicroController {
   async remove(@Payload() id: string) {
     try {
       const role = await this.roleService.remove(id);
-      return createResponse<Role>({
+      return createResponse<RoleEntity>({
         statusCode: HttpStatus.OK,
         data: role,
       });

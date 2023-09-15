@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
+import { UserEntity } from './entities/user.entity';
 import { UserRestController } from './user.controller.rest';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { APP_HOST, USER_SERVICE, USER_SERVICE_PORT } from 'src/config';
@@ -9,7 +9,7 @@ import { UserMicroController } from './user.controller.micro';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([UserEntity]),
     ClientsModule.register([
       {
         name: USER_SERVICE,

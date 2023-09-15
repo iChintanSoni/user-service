@@ -56,10 +56,11 @@ export class UserRestController {
       const responseWrapper = await sendToClient({
         client: this.client,
         event: 'findAllUser',
-        payload: null,
+        payload: undefined,
       });
       respondWith(response, responseWrapper);
     } catch (error) {
+      console.error(error);
       respondWith(
         response,
         createResponse({

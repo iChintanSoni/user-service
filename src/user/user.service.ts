@@ -2,39 +2,40 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
+import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { randomUUID } from 'crypto';
 import { RegisterUser } from './dto/register-user.dto';
 import { UserAlreadyExists } from './user.service.error';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {}
 
   create(createUserDto: CreateUserDto) {
-    const user = new User();
+    const user = new UserEntity();
+    user.roleId = 'other';
     user.instituteBranchId = createUserDto.instituteBranchId;
     user.firstName = createUserDto.firstName;
     user.lastName = createUserDto.lastName;
     user.email = createUserDto.email;
-    user.roleId = randomUUID();
-    return this.userRepository.save(createUserDto);
+    user.userName = createUserDto.email.split('@')[0];
+    user.password = `${createUserDto.email.split('@')[0]}@123`;
+    return this.userRepository.save(user);
   }
 
   findAll() {
     return this.userRepository.find();
   }
 
-  findOne(id: string): Promise<User | null> {
+  findOne(id: string): Promise<UserEntity | null> {
     return this.userRepository.findOneBy({ id: id });
   }
 
   async update(updateUserDto: UpdateUserDto) {
-    const user: User = await this.findOne(updateUserDto.id);
+    const user: UserEntity = await this.findOne(updateUserDto.id);
     user.firstName = updateUserDto.firstName;
     user.lastName = updateUserDto.lastName;
     user.email = updateUserDto.email;
@@ -50,7 +51,7 @@ export class UserService {
     }
   }
 
-  async register(registerUser: RegisterUser): Promise<User> {
+  async register(registerUser: RegisterUser): Promise<UserEntity> {
     let user = await this.userRepository.findOne({
       where: {
         email: registerUser.email,
@@ -62,7 +63,7 @@ export class UserService {
         `User with email: ${user.email} already exists for this institute. Please try another email.`,
       );
     }
-    user = new User();
+    user = new UserEntity();
     user.roleId = 'other';
     user.instituteBranchId = registerUser.branchId;
     user.firstName = registerUser.firstName;

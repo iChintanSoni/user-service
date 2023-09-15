@@ -1,7 +1,7 @@
 import { PartialType } from '@nestjs/swagger';
-import { Role } from '../entities/role.entity';
+import { RoleEntity } from '../entities/role.entity';
 
-export class UpdateRoleDto extends PartialType(Role) {
+export class UpdateRoleDto extends PartialType(RoleEntity) {
   id: string;
   instituteBranchId: string;
   name: string;

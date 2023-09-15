@@ -9,8 +9,8 @@ import {
   DATABASE_PASSWORD,
   DATABASE_NAME,
 } from './config';
-import { User } from './user/entities/user.entity';
-import { Role } from './role/entities/role.entity';
+import { UserEntity } from './user/entities/user.entity';
+import { RoleEntity } from './role/entities/role.entity';
 
 @Module({
   imports: [
@@ -21,7 +21,7 @@ import { Role } from './role/entities/role.entity';
       username: DATABASE_USERNAME,
       password: DATABASE_PASSWORD,
       database: DATABASE_NAME,
-      entities: [User, Role],
+      entities: [UserEntity, RoleEntity],
       synchronize: true,
       autoLoadEntities: true,
     }),
