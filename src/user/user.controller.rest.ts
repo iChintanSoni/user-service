@@ -22,7 +22,7 @@ import {
 } from '@pilot/common/dist/response';
 import { Response } from 'express';
 
-@ApiTags('users')
+@ApiTags('User')
 @Controller('user')
 export class UserRestController {
   constructor(@Inject(USER_SERVICE) private readonly client: ClientProxy) {}

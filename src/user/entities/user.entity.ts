@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from '@pilot/common/dist/model/User';
+import { User } from '@pilot/common/dist/model/user.model';
 
-@Entity({ name: 'User' })
+@Entity('User')
 export class UserEntity implements User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
