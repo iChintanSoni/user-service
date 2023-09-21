@@ -19,7 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "update": "ncu -u && npm install --f",
-    "deploy": "cd .. && docker image prune -a && sh scripts/start-service.sh user-service"
+    "deploy": "cd .. && sh scripts/start-service.sh user-service"
   },
   "dependencies": {
     "@nestjs/common": "^10.2.5",
